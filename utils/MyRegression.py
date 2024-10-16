@@ -73,11 +73,11 @@ class MyRegression():
         if self.type == 'linear':
             errors = predictions - y
             loss = np.sum(errors ** 2) / (2 * m)
-        elif self.regression_type == 'logistic':
+        elif self.type == 'logistic':
             loss = -np.sum(y * np.log(predictions) + (1 - y) * np.log(1 - predictions)) / m
 
         if self.l1_ratio > 0:
-                loss += self.l1_ratio * np.sum(np.abs(self.coef_[1:]))
+            loss += self.l1_ratio * np.sum(np.abs(self.coef_[1:]))
         if self.l2_ratio > 0:
             loss += self.l2_ratio* np.sum(self.coef_[1:] ** 2)
 
@@ -96,7 +96,7 @@ class MyRegression():
         for i in range(self.max_iter):
             predictions = X.dot(self.coef_)
             if self.type == 'logistic':
-                predictions = self._sigmoid.dot(predictions)
+                predictions = self._sigmoid(predictions)
             errors = predictions - y
 
             # Counting Gradient
@@ -133,5 +133,8 @@ class MyRegression():
         """
         Main .predict() Method
         """
-        X = np.insert(X, 0, 1, axis=1)
-        return X.dot(self.coef_)
+        X = np.insert(X, 0, 1, axis=1)  # Add intercept term
+        predictions = X.dot(self.coef_)
+        if self.type == 'logistic':
+            predictions = self._sigmoid(predictions)
+        return predictions
