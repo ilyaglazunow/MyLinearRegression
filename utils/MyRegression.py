@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 class MyRegression():
     """
@@ -59,6 +60,7 @@ class MyRegression():
         self.max_iter = max_iter
         self.coef_ = None
         self.best_iteration_ = None
+        self.loss_values_ = np.array([])
 
     def _sigmoid(self, z: np.ndarray) -> np.ndarray:
         """
@@ -79,7 +81,7 @@ class MyRegression():
         if self.l1_ratio > 0:
             loss += self.l1_ratio * np.sum(np.abs(self.coef_[1:]))
         if self.l2_ratio > 0:
-            loss += self.l2_ratio* np.sum(self.coef_[1:] ** 2)
+            loss += (self.l2_ratio / 2) * np.sum(self.coef_[1:] ** 2)
 
         return loss
 
@@ -105,12 +107,13 @@ class MyRegression():
             if self.l1_ratio > 0:
                 gradient[1:] += self.l1_ratio * np.sign(self.coef_[1:])
             if self.l2_ratio > 0:
-                gradient[1:] += 2 * self.l2_ratio * self.coef_[1:]
+                gradient[1:] += self.l2_ratio * self.coef_[1:]
 
             self.coef_ = self.coef_ - self.learning_rate * gradient
 
             # Loss Computation
             loss = self._loss_computation(predictions, y, m)
+            self.loss_values_ = np.append(self.loss_values_, loss)
             
             if self.verbose == 0:
                 pass
